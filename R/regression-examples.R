@@ -49,6 +49,16 @@ linear_model_int <- lm(income ~ sex_cat*age_bir + race_eth_cat,
 logistic_model <- glm(glasses ~ eyesight_cat + sex_cat + income,
 											data = nlsy, family = binomial())
 
+#QUESTION 4
+poisson_model <- glm(nsibs ~ sex_cat + race_eth_cat + income,
+										 data = nlsy, family = poisson())
+
+#QUESTION 5
+risk_ratio_model <- glm(glasses ~ eyesight_cat + sex_cat,
+											data = nlsy, family = binomial(link = "log"))
+
+poisson_risk_ratio_model <- glm(glasses ~ eyesight_cat + sex_cat,
+												data = nlsy, family = poisson())
 
 ## Tables
 
@@ -91,7 +101,46 @@ tbl_int <- tbl_regression(
 		`sex_cat:age_bir` ~ "Sex/age interaction"
 	))
 
+tbl_uvregression(
+	nlsy,
+	x = sex_cat,
+	include = c(nsibs, sleep_wkdy, sleep_wknd, income),
+	method = lm
+)
+
+#QUESTION 4
+tbl_regression(
+	poisson_model,
+	exponentiate = TRUE,
+	label = list(
+		sex_cat ~ "Sex",
+		race_eth_cat ~ "Race/Ethnicity",
+		income~ "Income"
+	))
+
+#QUESTION 5
+tbl_regression(
+	risk_ratio_model,
+	exponentiate = TRUE,
+	label = list(
+		sex_cat ~ "Sex",
+		eyesight_cat ~ "Eyesight"
+	))
+
+
+#QUESTION 6
+tbl_regression(
+	poisson_risk_ratio_model,
+	exponentiate = TRUE,
+	tidy_fun = partial(tidy_robust, vcov = "HCI"),
+	label = list(
+		sex_cat ~ "Sex",
+		eyesight_cat ~ "Eyesight"
+	))
+
+
 ## Table comparing the models with and without interaction
 
 tbl_merge(list(tbl_no_int, tbl_int),
 					tab_spanner = c("**Model 1**", "**Model 2**"))
+

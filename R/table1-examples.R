@@ -20,20 +20,23 @@ tbl_summary(
 	nlsy,
 	by = sex_cat,
 	include = c(sex_cat, race_eth_cat, region_cat,
-							eyesight_cat, glasses, age_bir))
+							eyesight_cat, glasses, age_bir, income, starts_with("sleep")))
 
 
 tbl_summary(
 	nlsy,
 	by = sex_cat,
 	include = c(sex_cat, race_eth_cat, region_cat,
-							eyesight_cat, glasses, age_bir),
+							eyesight_cat, glasses, age_bir, income, starts_with("sleep")),
 	label = list(
 		race_eth_cat ~ "Race/ethnicity",
 		region_cat ~ "Region",
 		eyesight_cat ~ "Eyesight",
 		glasses ~ "Wears glasses",
-		age_bir ~ "Age at first birth"
+		age_bir ~ "Age at first birth",
+		income ~ "Income",
+		sleep_wkdy ~ "Sleep Weekday",
+		sleep_wknd ~ "Sleep Weekend"
 	),
 	missing_text = "Missing")
 
@@ -42,18 +45,33 @@ tbl_summary(
 	nlsy,
 	by = sex_cat,
 	include = c(sex_cat, race_eth_cat,
-							eyesight_cat, glasses, age_bir),
+							eyesight_cat, glasses, age_bir,income, starts_with("sleep")),
 	label = list(
 		race_eth_cat ~ "Race/ethnicity",
 		eyesight_cat ~ "Eyesight",
 		glasses ~ "Wears glasses",
-		age_bir ~ "Age at first birth"
+		age_bir ~ "Age at first birth",
+		income ~ "Income",
+		sleep_wkdy ~ "Sleep Weekday",
+		sleep_wknd ~ "Sleep Weekend"
 	),
-	missing_text = "Missing") |>
+	statistic = list(
+		income ~ "{p10}, {p90}",
+		starts_with("sleep") ~ "{min}, {max}")
+)
+digits = list(
+	income ~ 3,
+	starts_with("sleep") ~ 1
+)
+	missing_text = "Missing"
 	add_p(test = list(all_continuous() ~ "t.test",
 										all_categorical() ~ "chisq.test")) |>
 	add_overall(col_label = "**Total**") |>
 	bold_labels() |>
 	modify_footnote(update = everything() ~ NA) |>
 	modify_header(label = "**Variable**", p.value = "**P**")
+
+#For the income variable, show the 10th and 90th percentiles of income with 3
+#digits, and for the sleep variables, show the min and the max with 1 digit.,
+
 
